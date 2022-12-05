@@ -48,9 +48,12 @@ export default {
             .then(({status, result}) => {
                 console.log("Result: ", result)
                 console.log("Status: ", status)
-                if (status == 400)
-                for (const [key, value] of Object.entries(result)) {
-                    this.messages.push(`Erreur pour le champ ${key}: ${value}`)
+                if (status == 400){
+                    for (const [key, value] of Object.entries(result)) {
+                        this.messages.push(`Erreur pour le champ ${key}: ${value}`)
+                    }
+                } else {  // 200
+                    this.messages.push(`Apprenant ${result.appr_prenom} ${result.appr_nom} ajouté avec succès!`)
                 }
             })
             .catch((error) => {
