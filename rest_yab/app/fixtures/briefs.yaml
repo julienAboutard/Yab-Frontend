@@ -1,0 +1,42 @@
+- model: app.brief
+  pk: 2
+  fields:
+    brief_title: YAB - Yet Another Binomotron
+    brief_url: https://simplonline.co/briefs/ee7ef768-a817-49bb-9c80-05a828744007
+    brief_nb_apprs: 2
+- model: app.brief
+  pk: 3
+  fields:
+    brief_title: Présenter un algorithme de Machine Learning
+    brief_url: https://simplonline.co/briefs/dd8f3d9e-9718-4c13-93f8-cc624e787934
+    brief_nb_apprs: 2
+- model: app.brief
+  pk: 4
+  fields:
+    brief_title: Mon premier algorithme de machine learning
+    brief_url: https://simplonline.co/briefs/9031f788-375a-4767-8593-b7854a97707e
+    brief_nb_apprs: 5
+- model: app.brief
+  pk: 5
+  fields:
+    brief_title: Aide au diagnostic
+    brief_url: https://simplonline.co/briefs/49caaf1d-e301-41fc-b75c-bde1cfedf450
+    brief_nb_apprs: 3
+- model: app.brief
+  pk: 6
+  fields:
+    brief_title: YAB Enhanced
+    brief_url: https://simplonline.co/briefs/6e0d6f1d-f54c-482a-9708-35cec05d28e5
+    brief_nb_apprs: 2
+- model: app.brief
+  pk: 7
+  fields:
+    brief_title: Configuration de l environnement numérique de travail
+    brief_url: https://simplonline.co/briefs/d88b7277-e371-4450-942f-e8cdf7dd98bc
+    brief_nb_apprs: 2
+- model: app.brief
+  pk: 8
+  fields:
+    brief_title: Mon environnement de développement IDE
+    brief_url: https://simplonline.co/briefs/720263d7-9f1e-44ef-822d-79e21b5b0dc2
+    brief_nb_apprs: 4
