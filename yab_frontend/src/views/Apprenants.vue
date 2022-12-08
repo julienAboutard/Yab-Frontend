@@ -66,6 +66,8 @@ export default {
                 } else {  // 200
                     this.messages.push(`Apprenant ${result.appr_prenom} ${result.appr_nom} ajouté avec succès!`)
                     this.msg_class = "succes_msg"
+                    this.hide_all()
+                    this.fetchApprs()
                 }
             })
             .catch((error) => {

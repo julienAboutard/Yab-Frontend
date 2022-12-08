@@ -1,5 +1,4 @@
 from random import randrange
-from tokenize import group
 from typing import List
 
 from django.shortcuts import get_object_or_404
@@ -8,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Appr, Brief, Group
-from .serializers import ApprSerializer, BriefSerializer, GroupSerializer
+from .serializers import ApprSerializer, BriefSerializer, BriefCUSerializer, GroupSerializer
 
 
 def generate_nomes(brief: Brief, apprenants: List[Appr]):
@@ -37,7 +36,6 @@ def generate_nomes(brief: Brief, apprenants: List[Appr]):
 
         n_omes.append(n_ome)
         i_nome += 1
-
 
     already_added_indexes = []
     for a in lasts:
@@ -69,6 +67,20 @@ class BriefViewSet(viewsets.ModelViewSet):
     queryset = Brief.objects.all()
     serializer_class = BriefSerializer
 
+    def get_serializer_class(self):
+        serializers = {
+            "create": BriefCUSerializer,
+            "update": BriefCUSerializer,
+            "partial_update": BriefCUSerializer,
+            "list": BriefSerializer,
+            "retrieve": BriefSerializer,
+        }
+        print("###################")
+        print(self.action)
+        print(serializers.get(self.action))
+        print("###################")
+        return serializers.get(self.action)
+
 
 class GenGoupsView(APIView):
     """
@@ -89,3 +101,4 @@ class GenGoupsView(APIView):
         groups = GroupSerializer(generate_nomes(brief, apprenants), many=True)
         print(groups.data)
         return Response(groups.data)
+
