@@ -147,6 +147,11 @@ export default {
         async createGroup(brief_id) {
             fetch(`http://127.0.0.1:8000/api/briefs/gen_groups/${brief_id}`, {
                 method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({"force":1})
             })
             .then( (response) => {
                 this.clearMessages()
@@ -192,7 +197,7 @@ export default {
     <div v-else>
         <ul v-for="brief in this.briefs">
             <li>{{ brief.brief_title }}
-                <!-- <a href="#" @click="createGroup(brief.id)">Créer Groupes</a> |&nbsp; -->
+                <a href="#" @click="createGroup(brief.id)">Créer Groupes</a> |&nbsp;
                 <a href="#" @click="show(brief.id)">Modifier</a> |&nbsp;
                 <a href="#" @click="deleteBrief(brief.id, brief.brief_title)">Supprimer</a>
                 <br>
