@@ -160,34 +160,45 @@ export default {
 </script>
 
 <template>
-    <ul :class="msg_class" v-for="message in this.messages">
-        <li>{{ message }}</li>
-    </ul>
+    <v-list-item :class="msg_class">
+        <v-list-item-content v-for="message in this.messages">
+            {{ message }}
+        </v-list-item-content>
+    </v-list-item>
+
     <p v-if="!apprenants">Loading...</p>
-    <div v-else>
-        <ul v-for="appr in this.apprenants">
-            <li>{{ appr.appr_prenom }} {{ appr.appr_nom }}
-                <a href="#" @click="show(appr.id)">Modifier</a> |&nbsp;
-                <a href="#" @click="deleteAppr(appr.id, appr.appr_prenom, appr.appr_nom)">Supprimer</a>
-                <br>
-                <form style="display: none;" :ref="'f_update_' + appr.id" @submit.prevent="updateAppr(appr.id)">
-                    <label for="nom">Nom</label>
-                    <input name="nom" v-model="cur_appr_nom">
-                    <label for="prenom">Prénom</label>
-                    <input name="prenom" v-model="cur_appr_prenom">
-                    <button>Mettre à jour</button>
-                </form>
-            </li>
-        </ul>
-    </div>
+    <v-list v-else>
+        <v-container>
+            <v-list-item 
+                v-for="(appr,i) in this.apprenants"
+                v:key="i">
+                <v-card>
+                    <v-list-item-content>
+                        <v-list-item-title v-text="appr.appr_prenom +' '+ appr.appr_nom"></v-list-item-title>
+                        <a href="#" @click="show(appr.id)">Modifier</a> |&nbsp;
+                        <a href="#" @click="deleteAppr(appr.id, appr.appr_prenom, appr.appr_nom)">Supprimer</a>
+                        <br>
+                        <form style="display: none;" :ref="'f_update_' + appr.id" @submit.prevent="updateAppr(appr.id)">
+                            <v-container>
+                                <v-text-field v-model="cur_appr_nom"></v-text-field>
+                                <v-text-field v-model="cur_appr_prenom"></v-text-field>
+                                <v-btn @click="updateAppr(appr.id)">Mettre à jour</v-btn>
+                            </v-container>
+                        </form>
+                    </v-list-item-content>
+                </v-card>
+            </v-list-item>
+        </v-container>    
+    </v-list>
+    <br>
     <h2>Ajouter un apprenant</h2>
-    <form @submit.prevent="addAppr">
-        <label for="prenom">Prénom</label>
-        <input name="prenom" v-model="new_appr_prenom">
-        <label for="nom">Nom</label>
-        <input name="nom" v-model="new_appr_nom">
-        <button>Ajouter</button>
-    </form>
+    <v-form @submit.prevent="addAppr">
+        <v-container>
+            <v-text-field v-model="new_appr_prenom" label="Prénom"></v-text-field>
+            <v-text-field v-model="new_appr_nom" label="Nom"></v-text-field>
+            <v-btn @click="addAppr">Ajouter</v-btn>
+        </v-container>
+    </v-form>
 </template>
 
 <style>
@@ -197,7 +208,7 @@ export default {
 .succes_msg {
     color: green;
 }
-ul {
-    list-style: none;
+.v-card {
+    background-color: blue;
 }
 </style>
