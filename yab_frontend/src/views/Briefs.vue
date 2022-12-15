@@ -31,7 +31,9 @@ export default {
             this.briefs.forEach(brief => {
                 console.log(`f_update_${brief.id}`)
                 this.$refs[`f_update_${brief.id}`][0].style.display = 'none'
+                this.$refs[`detail${brief.id}`][0].style.display = 'none'
             });
+            this.$refs.add_brief.style.display = 'none'
         },
         async addBrief() {
             fetch("http://127.0.0.1:8000/api/briefs/", {
@@ -190,11 +192,11 @@ export default {
                 console.error('Error:', error);
             })        
         },
-        show(brief_id) {
+        showUpdate(brief_id) {
+            this.clearMessages()
             console.log(`Will display appr #${brief_id} update form`)
-            this.briefs.forEach(brief => {
+            this.briefs.find(brief => {
                 console.log(`f_update_${brief.id}`)
-                this.$refs[`f_update_${brief.id}`][0].style.display = 'none'
                 if (brief.id == brief_id){
                     this.cur_brief_title = brief.brief_title
                     this.cur_brief_url = brief.brief_url
@@ -202,8 +204,37 @@ export default {
                     this.sav_nb_apprs = brief.brief_nb_apprs
                 }
             });
-            this.$refs[`f_update_${brief_id}`][0].style.display = 'block'
+            if (this.$refs[`f_update_${brief_id}`][0].style.display != 'block') {
+                this.hide_all()
+                this.$refs[`f_update_${brief_id}`][0].style.display = 'block'
+            } else {
+                this.hide_all()
+            }
         },
+        showAdd() {
+            this.clearMessages()
+            console.log(`Will display appr add form`)
+            if (this.$refs.add_brief.style.display != 'block') {
+                this.hide_all()
+                this.$refs.add_brief.style.display = 'block'
+            } else {
+                this.hide_all()
+            }
+        },
+        showBriefDetails(brief_id) {
+            console.log(`Will display brief details #${brief_id}`)
+            this.clearMessages()
+            this.briefs.forEach(brief => {
+                console.log(`f_update_${brief.id}`)
+            });
+            if (this.$refs[`detail${brief_id}`][0].style.display != 'block') {
+                this.hide_all();
+                this.$refs[`detail${brief_id}`][0].style.display = 'block'
+            } else {
+                this.hide_all()
+            }
+        }
+
     },
     mounted() {
         this.fetchBriefs()
@@ -211,67 +242,103 @@ export default {
 }
 </script>
 
-<template>
-    <div>
-        <v-list-item :class="msg_class">
-            <v-list-item-content v-for="message in this.messages">
-                {{ message }}
-            </v-list-item-content>
-        </v-list-item>
-
-        <p v-if="!briefs">Loading...</p>
-        <v-list v-else>
-            <v-list-item 
-                v-for="(brief,i) in this.briefs"
-                v:key="i">
-                <v-list-item-content>
-                    <v-list-item-title v-text="brief.brief_title"></v-list-item-title>
-                    <a href="#" @click="createGroup(brief.id)">Créer Groupes</a> |&nbsp;
-                    <a href="#" @click="show(brief.id)">Modifier</a> |&nbsp;
-                    <a href="#" @click="deleteAppr(brief.id, brief.brief_title)">Supprimer</a>
-                    <br>
-                    <form style="display: none;" :ref="'f_update_' + brief.id" @submit.prevent="updateBrief(brief.id)">
-                        <v-container>
-                            <v-text-field v-model="cur_brief_title" label="Title"></v-text-field>
-                            <v-text-field v-model="cur_brief_url" label="URL"></v-text-field>
-                            <v-text-field v-model="cur_brief_nb_apprs" label="Nombre d'apprenants"></v-text-field>
-                            <v-btn @click="updateBrief(brief.id)">Mettre à jour</v-btn>
-                        </v-container>
-                    </form>
-                </v-list-item-content>
-                <v-list-item-content v-if="(brief.groups.length==0)">
-                    <v-list-item-title>Les groupes pour ce brief n'ont pas été encore créés</v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-content v-else>
-                    <v-list-item 
-                        v-for="(group,i) in brief.groups"
-                        v:key="i">
-                        <v-list-item-content>
-                            <v-list-item-title v-text="group.grp_nom"></v-list-item-title>
-                            <v-list-item 
-                                v-for="(appr,i) in group.grp_apprs"
-                                v:key="i">
-                                <v-list-item-content>
-                                    <v-list-item-title v-text="appr.appr_prenom +' '+ appr.appr_nom"></v-list-item-title>
-                                </v-list-item-content>
-                            </v-list-item>
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list-item-content>
-            </v-list-item>
-        </v-list>
-        <br>
-        <h2>Ajouter un brief</h2>
+<template id="brief">
+    <v-card class="surcard">
+        <v-card-title>
+            <span>Briefs</span>
+        </v-card-title>
+        <v-spacer></v-spacer>
+        <v-card-action>
+            <v-btn @click="showAdd()" icon>
+                <v-icon>mdi-plus-box</v-icon>
+            </v-btn>
+        </v-card-action>   
+    </v-card>
+    <div style="display: none; width: 90%;" ref="add_brief">
         <v-form @submit.prevent="addBrief">
-            <v-container>
-                <v-text-field v-model="new_brief_title" label="Title"></v-text-field>
-                <v-text-field v-model="new_brief_url" label="URL"></v-text-field>
-                <v-text-field v-model="new_brief_nb_apprs" label="Nombre d'apprenants"></v-text-field>
-                <v-btn @click="addBrief">Ajouter</v-btn>
-            </v-container>
-        </v-form>
+            <h2>Ajouter un brief</h2>
+            <v-text-field v-model="new_brief_title" label="Title"></v-text-field>
+            <v-text-field v-model="new_brief_url" label="URL"></v-text-field>
+            <v-text-field v-model="new_brief_nb_apprs" label="Nombre d'apprenants"></v-text-field>
+            <v-btn @click="addBrief">Ajouter</v-btn>
+    </v-form>
+    </div>
+    
+    <v-card id="msg" :class="msg_class" ref="msg" v-for="message in this.messages">
+        <v-card-title>{{ message }}</v-card-title>
+    </v-card>
+    <div id="list" v-for="(brief, i) in this.briefs" :key="i">
+        <v-card class="card">
+            <v-card-title>
+            <span>{{ brief.brief_title }}</span>
+            </v-card-title>
+            <v-spacer></v-spacer>
+            <v-card-action>
+                <v-btn @click="showBriefDetails(brief.id)" icon>
+                    <v-icon>
+                        mdi-eye
+                    </v-icon>
+                </v-btn>
+                <v-btn @click="showUpdate(brief.id)" icon>
+                    <v-icon>
+                        mdi-pencil
+                    </v-icon>
+                </v-btn>
+                <v-btn @click="deleteBrief(brief.id, brief.brief_title)" icon>
+                <v-icon>
+                    mdi-delete
+                </v-icon>
+                </v-btn>
+            </v-card-action>               
+        </v-card>
+        <div style="display: none;" :ref="'detail' + brief.id" class="undercard">
+            <v-card class="detailcard">
+                <v-card-title class="detailtitle">Détails</v-card-title>
+            </v-card>
+            <v-card class="detailcard2">
+                <v-card-title>
+                    <span>URL:</span> {{brief.brief_url}} 
+                </v-card-title>
+                <v-card-title>
+                    <span>Nombre d'apprenants:</span> {{brief.brief_nb_apprs}}
+                </v-card-title>
+            </v-card>
+            <v-card class="detailcard">
+                <v-card-title class="detailtitle">Groupes</v-card-title>
+                <v-spacer></v-spacer>
+                <v-card-action>
+                    <v-btn @click="createGroup(brief.id)" icon>
+                        <v-icon>
+                            mdi-account-multiple-plus
+                        </v-icon>
+                    </v-btn>
+                </v-card-action>
+            </v-card>
+            <v-card class="group" v-if="(brief.groups.length != 0)" v-for="(group,i) in brief.groups" :key="i">
+                <v-card-title><span>{{ group.grp_nom}}</span></v-card-title>
+                <v-card>
+                    <v-card-title v-for="(appr,i) in group.grp_apprs" :key="i">
+                        {{ appr.appr_prenom }} {{ appr.appr_nom }}
+                    </v-card-title>
+                </v-card>
+            </v-card>
+            <v-card class="group" v-else>
+                <v-card-title>
+                    Les groupes ne sont pas encores créés
+                </v-card-title>
+            </v-card>
+        </div>
+        <div style="display: none;" :ref="'f_update_' + brief.id" @submit.prevent="updateBrief(brief.id)">
+            <v-form @submit.prevent="updateBrief(brief.id)">
+                <v-text-field v-model="cur_brief_title"></v-text-field>
+                <v-text-field v-model="cur_brief_url"></v-text-field>
+                <v-text-field v-model="cur_brief_nb_apprs"></v-text-field>     
+                <v-btn id="btn_form" @click="updateBrief(brief.id)">Mettre à jour</v-btn>            
+            </v-form> 
+        </div>
     </div>
 </template>
+
 
 <style>
 .err_msg {
@@ -280,7 +347,64 @@ export default {
 .succes_msg {
     color: green;
 }
-ul {
-    list-style: none;
+.v-card.card {
+    background-color: #e8e7dc;
+    display: flex;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    margin-bottom: 1%;
+}
+.v-card.surcard {
+    background-color: #59B984;
+    display: flex;
+    width: 90%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    margin-bottom: 1%;
+    margin-top: 0.5%;
+}
+.v-card.group {
+    background-color: #e8e7dc;
+    display: inline-block;
+    margin: 1%;
+    margin-left: 1.5%;
+    vertical-align: top;
+}
+#msg {
+    margin: 1%;
+}
+.v-card.detailcard {
+    background-color: #e8e7dc;
+    display: flex;
+    margin: 1%;
+    padding: 1%;
+}
+.v-card.detailcard2 {
+    display: block;
+    margin: 1.5%;
+    padding: 1%;
+}
+.v-card-title.detailtitle{
+    font-weight: bold;
+
+}
+.v-btn {
+    margin-right: 10px;
+}
+#brief {
+    display: flex;
+}
+#list {
+    width: 90%;
+}
+.v-form {
+    width: 90%;
+    margin: 10px;
+}
+.undercard.v-card {
+    width: 90%;
+}
+span {
+    font-weight: bold;
 }
 </style>

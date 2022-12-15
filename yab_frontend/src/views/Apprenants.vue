@@ -28,6 +28,7 @@ export default {
                 console.log(`f_update_${appr.id}`)
                 this.$refs[`f_update_${appr.id}`][0].style.display = 'none'
             });
+            this.$refs.add_appr.style.display = 'none'
         },
         async addAppr() {
             fetch("http://127.0.0.1:8000/api/apprenants/", {
@@ -65,6 +66,7 @@ export default {
                     this.msg_class = "err_msg"
                 } else {  // 200
                     this.messages.push(`Apprenant ${result.appr_prenom} ${result.appr_nom} ajouté avec succès!`)
+                    
                     this.msg_class = "succes_msg"
                     this.hide_all()
                     this.fetchApprs()
@@ -110,6 +112,7 @@ export default {
                     this.msg_class = "err_msg"
                 } else {  // 200
                     this.messages.push(`Apprenant ${result.appr_prenom} ${result.appr_nom} mis à jour avec succès!`)
+                    
                     this.msg_class = "succes_msg"
                     this.hide_all()
                     this.fetchApprs()
@@ -128,8 +131,10 @@ export default {
                     this.clearMessages()
                     if (response.status == 204) {
                         this.messages.push(`Apprenant supprimé avec succès!`)
+                        
                         this.msg_class = "succes_msg"
                         this.hide_all()
+
                         this.fetchApprs()
                     } else {
                         throw Error(response.statusText);
@@ -140,18 +145,35 @@ export default {
                 })
             }
         },
-        show(appr_id) {
-            console.log(`Will display appr #${appr_id} update form`)
-            this.apprenants.forEach(appr => {
-                console.log(`f_update_${appr.id}`)
-                this.$refs[`f_update_${appr.id}`][0].style.display = 'none'
+        async show(appr_id) {
+            this.clearMessages()
+            this.apprenants.find(appr => {
                 if (appr.id == appr_id){
                     this.cur_appr_nom = appr.appr_nom
                     this.cur_appr_prenom = appr.appr_prenom
                 }
             });
-            this.$refs[`f_update_${appr_id}`][0].style.display = 'block'
+            if (this.$refs[`f_update_${appr_id}`][0].style.display != 'block') {
+                this.hide_all() 
+                this.$refs[`f_update_${appr_id}`][0].style.display = 'block'
+            } else {
+                this.hide_all()
+            }
+            
+            
+        },
+        showAdd() {
+            this.clearMessages()
+            console.log(`Will display appr add form`)
+            if (this.$refs.add_appr.style.display != 'block') {
+                this.hide_all()
+                this.$refs.add_appr.style.display = 'block'
+            } else {
+                this.hide_all()
+            }
+            
         }
+
     },
     mounted() {
         this.fetchApprs()
@@ -159,46 +181,56 @@ export default {
 }
 </script>
 
-<template>
-    <v-list-item :class="msg_class">
-        <v-list-item-content v-for="message in this.messages">
-            {{ message }}
-        </v-list-item-content>
-    </v-list-item>
-
-    <p v-if="!apprenants">Loading...</p>
-    <v-list v-else>
-        <v-container>
-            <v-list-item 
-                v-for="(appr,i) in this.apprenants"
-                v:key="i">
-                <v-card>
-                    <v-list-item-content>
-                        <v-list-item-title v-text="appr.appr_prenom +' '+ appr.appr_nom"></v-list-item-title>
-                        <a href="#" @click="show(appr.id)">Modifier</a> |&nbsp;
-                        <a href="#" @click="deleteAppr(appr.id, appr.appr_prenom, appr.appr_nom)">Supprimer</a>
-                        <br>
-                        <form style="display: none;" :ref="'f_update_' + appr.id" @submit.prevent="updateAppr(appr.id)">
-                            <v-container>
-                                <v-text-field v-model="cur_appr_nom"></v-text-field>
-                                <v-text-field v-model="cur_appr_prenom"></v-text-field>
-                                <v-btn @click="updateAppr(appr.id)">Mettre à jour</v-btn>
-                            </v-container>
-                        </form>
-                    </v-list-item-content>
-                </v-card>
-            </v-list-item>
-        </v-container>    
-    </v-list>
-    <br>
-    <h2>Ajouter un apprenant</h2>
-    <v-form @submit.prevent="addAppr">
-        <v-container>
+<template id="appr">
+    <v-card class="surcard">
+        <v-card-title>
+            <span>Apprenants</span>
+        </v-card-title>
+        <v-spacer></v-spacer>
+        <v-card-action>
+            <v-btn @click="showAdd()" icon>
+                <v-icon>mdi-plus-box</v-icon>
+            </v-btn>
+        </v-card-action>   
+    </v-card>
+    <div style="display: none; width: 90%;" ref="add_appr">
+        <v-form @submit.prevent="addAppr">
+            <h2>Ajouter un apprenant</h2>
             <v-text-field v-model="new_appr_prenom" label="Prénom"></v-text-field>
             <v-text-field v-model="new_appr_nom" label="Nom"></v-text-field>
             <v-btn @click="addAppr">Ajouter</v-btn>
-        </v-container>
-    </v-form>
+        </v-form>
+    </div>
+    <v-card :class="msg_class" ref="msg" v-for="message in this.messages">
+        <v-card-title>{{ message }}</v-card-title>
+    </v-card>
+    <div id="list" v-for="(appr, i) in this.apprenants" :key="i">
+        <v-card class="card">
+            <v-card-title>
+            <span>{{ appr.appr_prenom }} {{ appr.appr_nom }}</span>
+            </v-card-title>
+            <v-spacer></v-spacer>
+            <v-card-action>
+                <v-btn @click="show(appr.id)" icon>
+                    <v-icon>
+                        mdi-pencil
+                    </v-icon>
+                </v-btn>
+                <v-btn @click="deleteAppr(appr.id, appr.appr_prenom, appr.appr_nom)" icon>
+                <v-icon>
+                    mdi-delete
+                </v-icon>
+                </v-btn>
+            </v-card-action>               
+        </v-card>
+        <div style="display: none;" :ref="'f_update_' + appr.id">
+            <v-form>
+                <v-text-field v-model="cur_appr_prenom"></v-text-field>
+                <v-text-field v-model="cur_appr_nom"></v-text-field>            
+                <v-btn id="btn_form" @click="updateAppr(appr.id)">Mettre à jour</v-btn>            
+            </v-form>
+        </div>
+    </div>
 </template>
 
 <style>
@@ -208,7 +240,36 @@ export default {
 .succes_msg {
     color: green;
 }
-.v-card {
-    background-color: blue;
+.v-card.card {
+    background-color: #e8e7dc;
+    display: flex;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    margin-bottom: 1%;
 }
+.v-card.surcard {
+    background-color: #59B984;
+    display: flex;
+    width: 90%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    margin-bottom: 1%;
+    margin-top: 0.5%;
+}
+
+.v-btn {
+    margin-right: 10px;
+}
+#appr {
+    display: flex;
+}
+#list {
+    width: 90%;
+}
+.v-form {
+    width: 90%;
+    margin: 10px;
+    padding: 1%;
+}
+
 </style>

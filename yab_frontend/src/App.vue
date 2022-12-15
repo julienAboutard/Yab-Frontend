@@ -3,33 +3,44 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <v-app>
-    <v-toolbar dark color="#162130" style="height:10vh;">
-      <v-toolbar-title class="white--text">
-        <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-      </v-toolbar-title>
-      <v-toolbar-items>
-        <RouterLink to="/apprenants">Apprenants</RouterLink> |&nbsp;
-        <RouterLink to="/briefs">Briefs</RouterLink>
-      </v-toolbar-items>
-      <v-spacer></v-spacer>
-    </v-toolbar>
-  </v-app>
-
-
-  <!-- <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-      <nav>
-        <RouterLink to="/apprenants">Apprenants</RouterLink> |&nbsp;
-        <RouterLink to="/briefs">Briefs</RouterLink>
-      </nav>
-  </header> -->
-
+  <div id="app">
+    <v-card class="head">
+        <v-toolbar color="#b0564f">
+          <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="75" height="75" />
+          <v-spacer></v-spacer>
+          <nav>
+            <v-btn class="tool" to="/" icon><v-icon>mdi-home</v-icon></v-btn> 
+            <v-btn class="tool" to="/apprenants" icon><v-icon>mdi-account-multiple</v-icon></v-btn>
+            <v-btn class="tool" to="/briefs" icon><v-icon>mdi-file-multiple</v-icon></v-btn>
+          </nav>
+        </v-toolbar>
+    </v-card>
+  </div>
   <RouterView />
 </template>
 
 <style>
-  .v-application__wrap {
-    min-height: 0vh !important;
+  .head {
+    width: 90%;
+  }
+  .v-toolbar {
+    height: fit-content;
+  }
+  #app {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .tool {
+    margin-right: 10px;
+  }
+  nav {
+    padding-right: 4px;
+  }
+  body {
+    width: auto;
+    padding: 4px;
+    margin: 0%;
   }
 </style>
